@@ -1,28 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-  const quotes = {
-    quote1: "The only limit to our realization of tomorrow is our doubts of today.",
-    quote2: "The future belongs to those who believe in the beauty of their dreams.",
-    quote3: "Do not wait to strike till the iron is hot, but make it hot by striking."
-  };
+  const [time, setTime] = useState(new Date());
+  const [alarmTime, setAlarmTime] = useState('');
+  const [alarmTriggered, setAlarmTriggered] = useState(false);
 
-  const keys = Object.keys(quotes);
-  const [quote, setQuote] = useState(quotes[keys[0]]);
+  // Update current time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 1000); 
 
-  const generateQuote = () => {
-    const randomIndex = Math.floor(Math.random() * keys.length);
-    setQuote(quotes[keys[randomIndex]]);
-  };
+    return () => clearInterval(timer); // Cleanup
+  }, []);
+
+  // Check alarm
+  useEffect(() => {
+    const current = time.toTimeString().slice(0, 5); // "HH:MM" 
+    if (alarmTime === current && !alarmTriggered) {
+      alert("⏰ Alarm Ringing!");
+      setAlarmTriggered(true);
+    }
+    if (alarmTime !== current) {
+      setAlarmTriggered(false);
+    }
+  }, [time, alarmTime, alarmTriggered]);
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Random Quote Generator</h1>
-      <p>{quote}</p>
-      <button onClick={generateQuote}>New Quote</button>
+      <h2>Current Time: {time.toLocaleTimeString()}</h2>
+
+      <input
+        type="time"
+        onChange={(e) => setAlarmTime(e.target.value)}
+        value={alarmTime}
+      />
+      <p>Set Alarm Time: {alarmTime || '--:--'}</p>
     </div>
   );
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
 
